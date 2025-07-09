@@ -2,22 +2,20 @@ package mate.academy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import mate.academy.exception.RegistrationException;
 import mate.academy.lib.Injector;
 import mate.academy.model.CinemaHall;
 import mate.academy.model.Movie;
 import mate.academy.model.MovieSession;
 import mate.academy.model.Order;
 import mate.academy.model.ShoppingCart;
-import mate.academy.model.Ticket;
 import mate.academy.model.User;
+import mate.academy.security.AuthenticationService;
 import mate.academy.service.CinemaHallService;
 import mate.academy.service.MovieService;
 import mate.academy.service.MovieSessionService;
 import mate.academy.service.OrderService;
 import mate.academy.service.ShoppingCartService;
-import mate.academy.service.UserService;
 
 public class Main {
     private static final Injector injector = Injector.getInstance("mate.academy");
@@ -66,25 +64,18 @@ public class Main {
         System.out.println(movieSessionService.findAvailableSessions(
                         fastAndFurious.getId(), LocalDate.now()));
 
-        User testUser = new User();
-        testUser.setEmail("test@gmail.com");
-        testUser.setPassword("password");
-
-        UserService userService = (UserService) injector.getInstance(UserService.class);
-        userService.add(testUser);
+        AuthenticationService authenticationService = (AuthenticationService) injector
+                .getInstance(AuthenticationService.class);
+        User testUser;
+        try {
+            testUser = authenticationService.register(
+                    "test@gmail.com", "password");
+        } catch (RegistrationException e) {
+            throw new RuntimeException("Can't register user", e);
+        }
 
         ShoppingCartService shoppingCartService = (ShoppingCartService) injector
                 .getInstance(ShoppingCartService.class);
-        shoppingCartService.registerNewShoppingCart(testUser);
-
-        Ticket ticket = new Ticket();
-        ticket.setUser(testUser);
-        ticket.setMovieSession(tomorrowMovieSession);
-
-        ShoppingCart shoppingCart = new ShoppingCart();
-        List<Ticket> tickets = new ArrayList<>();
-        tickets.add(ticket);
-        shoppingCartService.addSession(tomorrowMovieSession,testUser);
 
         OrderService orderService = (OrderService) injector.getInstance(OrderService.class);
         ShoppingCart testShoppingCart = shoppingCartService.getByUser(testUser);
