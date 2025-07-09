@@ -84,7 +84,6 @@ public class Main {
         ShoppingCart shoppingCart = new ShoppingCart();
         List<Ticket> tickets = new ArrayList<>();
         tickets.add(ticket);
-        shoppingCart.setTickets(tickets);
         shoppingCartService.addSession(tomorrowMovieSession,testUser);
 
         OrderService orderService = (OrderService) injector.getInstance(OrderService.class);
@@ -92,6 +91,6 @@ public class Main {
         Order order = orderService.completeOrder(testShoppingCart);
         System.out.println(order);
 
-        orderService.getOrdersHistory(testUser);
+        System.out.println(orderService.getOrdersHistory(testUser));
     }
 }
